@@ -67,11 +67,12 @@ add_filter('pre_comment_approved', function ($approved, $commentdata) {
     $response = isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : '';
     $query = sprintf('%s?secret=%s&response=%s&remoteip=%s', $api, $secret, $response, $_SERVER['REMOTE_ADDR']);
     $validation = file_get_contents($query);
-    $valid = json_decode($validation, true);
+    $valid = json_decode($validation, false);
 
-    if ($valid['success'] == false) {
+    if ($valid->success == true && $valid->score <= 0.5) {
         return 'spam';
     }
+    
     return $approved;
 }, 10, 2);
 
